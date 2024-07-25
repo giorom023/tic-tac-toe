@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic Tac Toe</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet" />
+  <!-- Stylesheet -->
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: "Raleway", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #303030, #3b3b3b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 2em;
+    }
+
+    .scoreboard {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1em;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 260px;
+    }
+
+    h2 {
+      color: #00ff40;
+      text-align: center;
+      margin-bottom: 1em;
+      font-size: 1.5em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background-color: #1a9e00;
+      color: #ffffff;
+      padding: 0.5em;
+      text-align: center;
+      font-size: 1.2em;
+    }
+
+    tbody td {
+      background-color: #f0f0f0;
+      color: #333;
+      padding: 0.5em;
+      text-align: center;
+      font-size: 1.2em;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 1em;
+    }
+
+    .popup {
+      background: linear-gradient(135deg, #8052ec, #d161ff);
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      display: flex;
+      z-index: 2;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1em;
+      font-size: 12vmin;
+    }
+
+    #message {
+      color: #ffffff;
+      text-align: center;
+      font-size: 1em;
+    }
+
+    .popup.hide {
+      display: none;
+    }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1em;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .game-title {
+      margin-bottom: 2em;
+    }
+
+    .game-title h1 {
+      color: #00ffb3;
+      font-size: 3em;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .container {
+      width: 70vmin;
+      height: 70vmin;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2vmin;
+    }
+
+    .button-option {
+      background: #ffffff;
+      height: 22vmin;
+      width: 22vmin;
+      border: none;
+      border-radius: 8px;
+      font-size: 12vmin;
+      color: #d161ff;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .button-option .inner-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 80%; /* Adjust size as needed */
+      width: 80%; /* Adjust size as needed */
+      background-color: #ffffff; /* Inner box color */
+    }
+
+    .controls button {
+      font-size: 1.3em;
+      padding: 1em;
+      border-radius: 8px;
+      background-color: #0a0027;
+      color: #ffffff;
+      border: none;
+      margin: 0.5em;
+    }
+
+    #new-game {
+      background-color: #d161ff;
+    }
+
+    #restart {
+      background-color: #007bff;
+    }
+
+    #toggle-mode {
+      background-color: #ffcc00;
+    }
+
+    #adjust-color {
+      background-color: #ff5722;
+    }
+
+    .color-picker {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1em;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 999;
+    }
+
+    .color-option {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      margin: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .color-picker-buttons {
+      text-align: center;
+      margin-top: 1em;
+    }
+
+    .color-picker-buttons button {
+      font-size: 1em;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      margin: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="game-container">
+      <div class="controls">
+        <button id="adjust-color">Adjust Color</button>
+        <button id="new-game">New Game</button>
+        <button id="restart">Restart Scores</button>
+        <button id="toggle-mode">Play with Bot</button>
+      </div>
+      <div class="game-title">
+        <h1>Tic Tac Toe</h1>
+      </div>
+      <div class="container">
+        <!-- The 9 slots for the game board -->
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+        <button class="button-option"><span class="inner-box"></span></button>
+      </div>
+    </div>
+    <div class="scoreboard">
+      <h2>Scoreboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Player X</th>
+            <th>Player O</th>
+            <th>Draws</th>
+          </tr>
+        </thead>
+        <tbody id="scoreboard-body">
+          <tr>
+            <td><span id="score-x">0</span></td>
+            <td><span id="score-o">0</span></td>
+            <td><span id="score-draw">0</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="popup hide">
+    <p id="message">Sample Message</p>
+    <button id="restart-game">Restart Game</button>
+  </div>
+
+  <div class="color-picker" id="color-picker">
+    <div class="color-option" style="background-color: #FF5733;"></div>
+    <div class="color-option" style="background-color: #33FF57;"></div>
+    <div class="color-option" style="background-color: #3357FF;"></div>
+    <div class="color-option" style="background-color: #FF33A6;"></div>
+    <div class="color-option" style="background-color: #A633FF;"></div>
+    <div class="color-option" style="background-color: #33FFF2;"></div>
+    <div class="color-picker-buttons">
+      <button id="pick-color">OK</button>
+      <button id="cancel-color">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const newGameBtn = document.getElementById("new-game");
+    const restartBtn = document.getElementById("restart");
+    const playModeBtn = document.getElementById("toggle-mode");
+    const adjustColorBtn = document.getElementById("adjust-color");
+    const buttons = document.querySelectorAll(".button-option");
+    const popup = document.querySelector(".popup");
+    const message = document.getElementById("message");
+    const restartGame = document.getElementById("restart-game");
+    const colorPicker = document.getElementById("color-picker");
+    const colorOptions = document.querySelectorAll(".color-option");
+    const pickColorBtn = document.getElementById("pick-color");
+    const cancelColorBtn = document.getElementById("cancel-color");
+
+    let currentPlayer = "X";
+    let playerXScore = 0;
+    let playerOScore = 0;
+    let drawScore = 0;
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let isBotMode = false; // Track the current mode
+    let gameActive = true;
+    let selectedColor = "#ffcc00"; // Default selected color
+
+    // Function to handle user action on game board
+    const handleUserAction = (button, index) => {
+      if (board[index] === "" && gameActive) {
+        board[index] = currentPlayer;
+        button.innerHTML = `<span style="color:${selectedColor}">${currentPlayer}</span>`;
+        checkResult();
+        togglePlayer();
+        if (isBotMode && currentPlayer === "O") {
+          botMove();
+        }
+      }
+    };
+
+    // Function to toggle current player
+    const togglePlayer = () => {
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+    };
+
+    // Function to check game result
+    const checkResult = () => {
+      const winConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+      ];
+
+      for (let i = 0; i < winConditions.length; i++) {
+        const [a, b, c] = winConditions[i];
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          endGame(currentPlayer + " wins!");
+          updateScore(currentPlayer);
+          return;
+        }
+      }
+
+      if (!board.includes("")) {
+        endGame("It's a draw!");
+        updateScore("draw");
+        return;
+      }
+    };
+
+    // Function to end game
+    const endGame = (result) => {
+      gameActive = false;
+      message.innerText = result;
+      popup.classList.remove("hide");
+    };
+
+    // Function to update scoreboard
+    const updateScore = (winner) => {
+      if (winner === "X") {
+        playerXScore++;
+      } else if (winner === "O") {
+        playerOScore++;
+      } else {
+        drawScore++;
+      }
+
+      document.getElementById("score-x").innerText = playerXScore;
+      document.getElementById("score-o").innerText = playerOScore;
+      document.getElementById("score-draw").innerText = drawScore;
+    };
+
+    // Function to reset board
+    const resetBoard = () => {
+      board = ["", "", "", "", "", "", "", "", ""];
+      buttons.forEach(button => {
+        button.innerHTML = '<span class="inner-box"></span>';
+      });
+      gameActive = true;
+      popup.classList.add("hide");
+    };
+
+    // Function to reset scoreboard
+    const resetScoreboard = () => {
+      playerXScore = 0;
+      playerOScore = 0;
+      drawScore = 0;
+
+      document.getElementById("score-x").innerText = playerXScore;
+      document.getElementById("score-o").innerText = playerOScore;
+      document.getElementById("score-draw").innerText = drawScore;
+    };
+
+    // Bot move function
+    const botMove = () => {
+      let emptyIndices = board.reduce((acc, curr, index) => {
+        return curr === "" ? acc.concat(index) : acc;
+      }, []);
+
+      if (emptyIndices.length > 0) {
+        let randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        board[randomIndex] = "O";
+        buttons[randomIndex].innerHTML = `<span style="color:${selectedColor}">O</span>`;
+        checkResult();
+        togglePlayer();
+      }
+    };
+
+    // Event listeners
+    buttons.forEach((button, index) => {
+      button.addEventListener("click", () => handleUserAction(button, index));
+    });
+
+    newGameBtn.addEventListener("click", resetBoard);
+    restartBtn.addEventListener("click", () => {
+      resetBoard();
+      resetScoreboard();
+    });
+
+    restartGame.addEventListener("click", resetBoard);
+
+    playModeBtn.addEventListener("click", () => {
+      isBotMode = !isBotMode;
+      playModeBtn.innerText = isBotMode ? "Play with Human" : "Play with Bot";
+      resetBoard();
+      resetScoreboard();
+    });
+
+    adjustColorBtn.addEventListener("click", () => {
+      colorPicker.style.display = "block";
+    });
+
+    colorOptions.forEach(option => {
+      option.addEventListener("click", () => {
+        selectedColor = option.style.backgroundColor;
+        document.documentElement.style.setProperty('--main-color', selectedColor);
+        document.body.style.background = `linear-gradient(135deg, ${selectedColor}, #3b3b3b)`;
+        document.querySelector('.game-title h1').style.color = selectedColor;
+      });
+    });
+
+    pickColorBtn.addEventListener("click", () => {
+      colorPicker.style.display = "none";
+    });
+
+    cancelColorBtn.addEventListener("click", () => {
+      colorPicker.style.display = "none";
+    });
+  </script>
+</body>
+</html>
